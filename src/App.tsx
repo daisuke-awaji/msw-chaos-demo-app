@@ -11,15 +11,26 @@ type Blog = {
 
 const Notifications = () => {
   const [entries, setEntries] = useState<Blog[]>([]);
+  const [error, setError] = useState<string | undefined>();
 
   const getEntries = async () => {
-    const { data } = await axios.get<Blog[]>("/entries");
-    setEntries(data);
+    try {
+      const { data } = await axios.get<Blog[]>("/entries");
+      setEntries(data);
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        setError(e.response?.data);
+      }
+    }
   };
 
   useEffect(() => {
     getEntries();
   }, []);
+
+  if (error) {
+    return <p style={{ color: "#ffff88" }}>🚨 {error}</p>;
+  }
 
   if (!entries.length) {
     return <p>Loading ...</p>;
