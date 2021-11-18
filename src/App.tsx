@@ -1,23 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import BlogCard from "./BlogCard";
+
+type Blog = {
+  title: string;
+  createdAt: string;
+  image: string;
+};
+
+const Notifications = () => {
+  const [entries, setEntries] = useState<Blog[]>([]);
+
+  const getEntries = async () => {
+    const { data } = await axios.get<Blog[]>("/entries");
+    setEntries(data);
+  };
+
+  useEffect(() => {
+    getEntries();
+  }, []);
+
+  if (!entries.length) {
+    return <p>Loading ...</p>;
+  }
+
+  return (
+    <div>
+      <h2>投稿一覧</h2>
+      <div>
+        {entries.map((e) => (
+          <div style={{ padding: 10 }}>
+            <BlogCard {...e} alt={e.title} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Notifications />
       </header>
     </div>
   );
